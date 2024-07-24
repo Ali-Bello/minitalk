@@ -14,18 +14,18 @@
 
 void    handle_sigusr1(int signum)
 {
-
+    return  ;
 }
 
 void    handle_sigusr2(int signum)
 {
-
+    return ;
 }
 
 int main()
 {
-    struct sigaction sa;
-    struct sigaction sa1;
+    struct  sigaction    sa;
+    struct  sigaction    sa1;
 
     sa.sa_handler = handle_sigusr1;
     sa.sa_handler = handle_sigusr2;
