@@ -25,9 +25,10 @@ void    send_message(int server_pid, char *str)
     i = 0;
     while (str[i])
     {
-        bit = 8;
-        while (bit)
+        bit = 7;
+        while (bit >= 0)
         {
+            printf("%d", (str[i] >> bit) & 1);
             if ((str[i] >> bit) & 1)
                 kill(server_pid, SIGUSR2);
             else
@@ -35,6 +36,7 @@ void    send_message(int server_pid, char *str)
             bit--;
             usleep(50);
         }
+        printf("\n");
         i++;
     }
 }
@@ -48,7 +50,7 @@ int main(int ac, char **av)
         write(1, "INVALID ARGUMENTS!\nUsage: ./client [SERVER_PID] [message]\n", 31);
         return (1);
     }
-    pid = ft_atoi(av[1]);
+    pid = ft_atoi(av[1], &pid);
     if (pid <= 0)
     {
         write(1, "INVALID PID\n", 12);
