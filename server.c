@@ -13,9 +13,6 @@
 #include "minitalk.h"
 #include <stdio.h>
 
-int bits_count;
-char    c;
-
 void printCharBits(char c)
 {
     for (int i = 7; i >= 0; i--)
@@ -38,28 +35,40 @@ void printBits(int num)
     printf("\n");
 }
 
-void    handle_sigusr1()
+void    handle_signals(int sig, siginfo_t *info, void *context)
 {
-    c = (c << 1) | 0;
-    bits_count++;
-    if (bits_count == 8)
-    {
-        // printCharBits(c);
-        write(1, &c, 1);
-        bits_count = 0;
-        c = 0;
-    }
-}
+    static int      bits_no;
+    static int      sender_pid;
+    static char     c;
 
-void    handle_sigusr2()
-{
-    c = (c << 1) | 1;
-    bits_count++;
-    if (bits_count == 8)
+    (void)context;
+    if (info)
     {
-        // printCharBits(c);
+        if (sender_pid == 0)
+            sender_pid = info->si_pid;
+        else if (sender_pid != info->si_pid)
+        {
+            sender_pid = 0;
+            bits_no = 0;
+            c = 0;
+        }
+    }
+    if (sig == SIGUSR1)
+    {
+        c = (c << 1) | 0;
+        bits_no++;
+    }
+    else if (sig == SIGUSR2)
+    {
+        c = (c << 1) | 1;
+        bits_no++;
+    }
+    if (bits_no == 8 && !c)
+        kill(sender_pid, SIGUSR2);
+    else if (bits_no == 8)
+    {
         write(1, &c, 1);
-        bits_count = 0;
+        bits_no = 0;
         c = 0;
     }
 }
@@ -67,18 +76,13 @@ void    handle_sigusr2()
 int main()
 {
     struct  sigaction    sa;
-    struct  sigaction    sa1;
 
-    sa.sa_handler = handle_sigusr1;
+    sa.sa_sigaction = handle_signals;
+    sa.sa_flags = SA_SIGINFO;
     sigemptyset(&sa.sa_mask);
-    sa1.sa_handler = handle_sigusr2;
-    sigemptyset(&sa1.sa_mask);
-    c = 0;
-    bits_count = 0;
-    printBits(bits_count);
     ft_printf("SERVER PID : %d\n", getpid());
     sigaction(SIGUSR1, &sa, NULL);
-    sigaction(SIGUSR2, &sa1, NULL);
+    sigaction(SIGUSR2, &sa, NULL);
     while (1)
         pause();
     return (0);
