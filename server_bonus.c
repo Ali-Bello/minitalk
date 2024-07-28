@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   server_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aderraj <aderraj@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 22:19:36 by marvin            #+#    #+#             */
-/*   Updated: 2024/07/28 04:40:52 by aderraj          ###   ########.fr       */
+/*   Updated: 2024/07/28 04:40:46 by aderraj          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,10 @@ void	handle_signals(int sig, siginfo_t *info, void *context)
 	construct_char(sig, &c, &bits_no);
 	if (bits_no == 8)
 	{
-		write(1, &c, 1);
+		if (!c)
+			kill(sender_pid, SIGUSR2);
+		else
+			write(1, &c, 1);
 		bits_no = 0;
 		c = 0;
 	}

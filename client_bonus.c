@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.c                                           :+:      :+:    :+:   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aderraj <aderraj@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/23 23:50:31 by marvin            #+#    #+#             */
-/*   Updated: 2024/07/28 04:46:12 by aderraj          ###   ########.fr       */
+/*   Updated: 2024/07/28 04:45:34 by aderraj          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	send_message(char *str)
 
 	if (!*str)
 	{
-		ft_printf(BOLD RED"ERROR : INVALID MESSAGE\n"RESET);
+		write(1, "INVALID MESSAGE\n", 16);
 		return ;
 	}
 	i = 0;
@@ -77,6 +77,9 @@ void	handle_sig(int signum)
 		send_final_sig();
 		exit(0);
 	}
+	else if (signum == SIGUSR2)
+		ft_printf(GREEN"message recieved by the server succesfully!\n"\
+		RESET);
 }
 
 int	main(int ac, char **av)
